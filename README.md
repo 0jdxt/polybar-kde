@@ -2,25 +2,25 @@
 
 [KDEConnect](https://github.com/KDE/kdeconnect-kde) module for [Polybar](https://github.com/jaagr/polybar)
 
-![menu](menu.gif)
+![menu](menu.png)
 ![pmenu](pmenu.gif)
 ![pmenu2](pmenu2.gif)
-![screenshot](screenshot.png)  
-Demo with [Material Theme](https://github.com/DaveDavenport/rofi-themes/blob/master/User%20Themes/material.rasi) and [Material Polybar](https://github.com/adi1090x/polybar-themes)
+![bar](bar.png)
+Demo with [Nord Theme](https://nordtheme.com) polybar, Blex Mono Nerd Font and custom [dmenu](https://github.com/0jdxt/dmenu)
 
 ## Dependencies
-* [rofi](https://github.com/DaveDavenport/rofi)
+* [dmenu](https://tools.suckless.org/dmenu)
 * [kdeconnect](https://github.com/KDE/kdeconnect-kde)
-* Iosevka Nerd Font
+* A Nerd Font
 * [Zenity](https://github.com/GNOME/zenity)
 * qbus-qt5 (or qt5tools on some distros)
 
 ## Usage
 Place the given script in some folder, and use it in your polybar `config` as
-```  
-[module/kdeconnect]  
-type = custom/script  
-exec = "/path/to/files/polybar-kdeconnect.sh -d"  
+```
+[module/kdeconnect]
+type = custom/script
+exec = "/path/to/files/polybar-kdeconnect.sh -d"
 tail = true
 ````
 
