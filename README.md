@@ -9,7 +9,7 @@
 
 Demo with:
 
-* [Nord Theme](https://nordtheme.com) polybar
+* [Nord Theme](https://github.com/0jdxt/dotfiles/blob/master/.config/polybar/config) polybar
 * [Blex Mono Nerd Font](https://www.nerdfonts.com/)
 * custom [dmenu](https://github.com/0jdxt/dmenu)
 
@@ -25,7 +25,7 @@ Demo with:
 
 Place the given script in some folder, and use it in your polybar `config` as
 
-```
+```ini
 [module/kdeconnect]
 type = custom/script
 exec = "/path/to/files/polybar-kdeconnect.sh -d"
@@ -34,9 +34,7 @@ tail = true
 
 ## Customization
 
-You can change the variables in [`polybar-kdeconnect.sh`](polybar-kdeconnect.sh)
-to customize the [rofi](https://github.com/DaveDavenport/rofi) menu and
-the icons shown in [polybar](https://github.com/jaagr/polybar)
+You can change the variables in [`polybar-kdeconnect.sh`](polybar-kdeconnect.sh) to customize the icons shown in [polybar](https://github.com/jaagr/polybar)
 
 ## Default Color Code Legend
 
