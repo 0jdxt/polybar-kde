@@ -1,4 +1,4 @@
-# polybar-kdeconnect
+# polybar-kde
 
 [KDEConnect](https://github.com/KDE/kdeconnect-kde) module for [Polybar](https://github.com/jaagr/polybar)
 
