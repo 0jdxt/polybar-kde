@@ -74,7 +74,7 @@ show_pmenu () {
 }
 
 show_pmenu2 () {
-    menu="$(printf "Accept\nReject" | dmenu -i -p "$1 has sent a pairing request")"
+    menu="$(printf "Accept\nReject" | dmenu -z 400 -i -p "$1 has sent a pairing request")"
     case "$menu" in
         *'Accept') kde "$2" acceptPairing ;;
         *)         kde "$2" rejectPairing ;;
