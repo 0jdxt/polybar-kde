@@ -3,6 +3,7 @@
 [KDEConnect](https://github.com/KDE/kdeconnect-kde) module for [Polybar](https://github.com/jaagr/polybar)
 
 ![bar](bar.png)
+
 ![menu](menu.png)
 ![pmenu](pmenu.png)
 
