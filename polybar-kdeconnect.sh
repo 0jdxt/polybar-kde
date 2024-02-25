@@ -11,7 +11,7 @@ COLOR_DISCONNECTED='#434C5E'       # Device Disconnected
 COLOR_NEWDEVICE='#8FBCBB'          # New Device
 
 # Icons shown in Polybar
-ICON_SMARTPHONE=''
+ICON_SMARTPHONE=''
 ICON_TABLET='臨'
 SEPERATOR=' '
 
@@ -26,23 +26,26 @@ show_devices (){
     IFS=$','
     devices=""
     for device in $(qdbus --literal org.kde.kdeconnect /modules/kdeconnect org.kde.kdeconnect.daemon.devices); do
+        # no devices found
+        [ "$device" = "{}" ] && echo && exit
+
         deviceid=$(echo "$device" | awk -F'["|"]' '{print $2}')
         devicename=$(kde "$deviceid" name)
         devicetype=$(kde "$deviceid" type)
         isreach=$(kde "$deviceid" isReachable)
-        istrust=$(kde "$deviceid" isTrusted)
+        ispaired=$(kde "$deviceid" isPaired)
 
-        if [ "$isreach" = "true" ] && [ "$istrust" = "true" ]; then
+        if [ "$isreach" = "true" ] && [ "$ispaired" = "true" ]; then
             battery="$(kde "$deviceid/battery" battery.charge)"
-            icon=$(get_icon "$battery" "$devicetype")
+            icon=$(get_icon "$battery" "$devicetype" "$devicename")
             devices+="%{A1:$DIR/polybar-kdeconnect.sh -n '$devicename' -i $deviceid -b $battery -m:}$icon%{A}$SEPERATOR"
-        elif [ "$isreach" = "false" ] && [ "$istrust" = "true" ]; then
-            devices+="$(get_icon -1 "$devicetype")$SEPERATOR"
+        elif [ "$ispaired" = "true" ] && [ "$isreach" = "false" ]; then
+            devices+="$(get_icon -1 "$devicetype" "$devicename")$SEPERATOR"
         else
-            haspairing="$(kde "$deviceid" hasPairingRequests)"
-            [ "$haspairing" = "true" ] && show_pmenu2 "$devicename" "$deviceid"
-            icon=$(get_icon -2 "$devicetype")
-            devices+="%{A1:$DIR/polybar-kdeconnect.sh -n $devicename -i $deviceid -p:}$icon%{A}$SEPERATOR"
+            pair_requested="$(kde "$deviceid" isPairRequestedByPeer)"
+            [ "$pair_requested" = "true" ] && show_pmenu2 "$devicename" "$deviceid"
+            icon=$(get_icon -2 "$devicetype" "$devicename")
+            devices+="%{A1:$DIR/polybar-kdeconnect.sh -n '$devicename' -i $deviceid -p:}$icon%{A}$SEPERATOR"
         fi
     done
     echo "${devices::-1}"
@@ -58,9 +61,12 @@ show_menu () {
         *'Send File')
             kde "$DEV_ID/share" share.shareUrl "file://$(zenity --file-selection)" ;;
         *'Browse Files')
-            [ "$(kde "$DEV_ID/sftp" sftp.isMounted)" = "false" ] && kde "$DEV_ID/sftp" sftp.mount
-            sleep 1
-            pcmanfm "$(kde "$DEV_ID/sftp" sftp.mountPoint)/primary" ;;
+            if [ "$(kde "$DEV_ID/sftp" sftp.isMounted)" = "true" ] ||
+                [ "$(kde "$DEV_ID/sftp" sftp.mountAndWait)" = "true" ]; then
+                    pcmanfm "$(kde "$DEV_ID/sftp" sftp.mountPoint)/primary"
+            else
+                notify-send "Could not mount filesystem" -i error
+            fi;;
         *'Unpair' )
             kde "$DEV_ID" unpair ;;
     esac
@@ -69,7 +75,7 @@ show_menu () {
 show_pmenu () {
     menu="$(echo Pair Device | dmenu -i)"
     case "$menu" in
-        *'Pair Device') kde "$DEV_ID" requestPair
+        *'Pair Device') kde "$DEV_ID" requestPairing
     esac
 }
 
@@ -77,10 +83,12 @@ show_pmenu2 () {
     menu="$(printf "Accept\nReject" | dmenu -z 400 -i -p "$1 has sent a pairing request")"
     case "$menu" in
         *'Accept') kde "$2" acceptPairing ;;
-        *)         kde "$2" rejectPairing ;;
+        *)         kde "$2" cancelPairing ;;
     esac
 
 }
+
+# only show icon and battery. $3 is the devicename
 get_icon () {
     icon=$ICON_SMARTPHONE
     [ "$2" = "tablet" ] && icon=$ICON_TABLET
